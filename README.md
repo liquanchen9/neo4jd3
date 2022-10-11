@@ -2,7 +2,7 @@
 
 [Neo4j](https://github.com/neo4j) graph visualization using [D3.js](https://github.com/d3/d3).
 
-![neo3jd3.js](https://`eisman`.github.io/neo4jd3/img/neo4jd3.jpg?v=0.0.5)
+![neo3jd3.js](https://`liquanchen9`.github.io/neo4jd3/img/neo4jd3.jpg?v=0.0.5)
 
 ## Features
 
@@ -173,7 +173,7 @@ var neo4jd3 = new Neo4jd3('.selector', options);
 
 ### Example
 
-Live example @ [https://eisman.github.io/neo4jd3/](https://eisman.github.io/neo4jd3/)
+Live example @ [https://liquanchen9.github.io/neo4jd3/](https://liquanchen9.github.io/neo4jd3/)
 
 ```javascript
 var neo4jd3 = new Neo4jd3('#neo4jd3', {
