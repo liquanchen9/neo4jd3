@@ -2,7 +2,7 @@
 
 [Neo4j](https://github.com/neo4j) graph visualization using [D3.js](https://github.com/d3/d3).
 
-![neo3jd3.js](https://eisman.github.io/neo4jd3/img/neo4jd3.jpg?v=0.0.5)
+![neo3jd3.js](https://`eisman`.github.io/neo4jd3/img/neo4jd3.jpg?v=0.0.5)
 
 ## Features
 
@@ -18,14 +18,15 @@
 * Relationship auto-orientation.
 * Zoom, pan, auto fit.
 * Compatible with D3.js v4.
+* 更换了ruby sass 编译插件 用了gulp-sass
+* 支持了菜单
 
 ## Running
 
 First of all, make sure you have ruby and sass gem installed. Then, clone the repository, install all dependencies, build and serve the project.
 
 ```bash
-> gem install sass
-> git clone https://github.com/eisman/neo4jd3.git
+> git clone https://github.com/liquanchen9/neo4jd3.git
 > npm install
 > gulp
 ```
@@ -58,6 +59,14 @@ var neo4jd3 = new Neo4jd3('.selector', options);
 | **onNodeMouseLeave** | *function* | Callback function to be executed when the mouse leaves a node. |
 | **onRelationshipDoubleClick** | *function* | Callback function to be executed when the user double clicks a relationship. |
 | **zoomFit** | *boolean* | Adjust the graph to the container once it has been loaded: `true`, `false`. Default: `false`. |
+| **menuOptions** | *object* | 菜单 对象 |
+| **menuOptions.radius** | *number* | 扩展比率  比圆大多少的一个比率值，基数：nodeRadius。默认1.8 |
+| **menuOptions.strokeColor** | *string* | 菜单边框颜色。默认 ‘white’ |
+| **menuOptions.strokeWidth** | *int* | 菜单边框粗细。默认 2 |
+| **menuOptions.items** | *array* | 菜单列表 |
+| **menuOptions.items.icon** | *string* | 菜单图标 |
+| **menuOptions.items.label** | *string* | 菜单文案 |
+| **menuOptions.items.onclick** | *function* | 菜单点击事件 |
 
 ### JavaScript API
 
@@ -235,17 +244,27 @@ var neo4jd3 = new Neo4jd3('#neo4jd3', {
                 break;
         }
     },
-    zoomFit: true
+    zoomFit: true,
+    menuOptions: {
+      items:[
+        {
+          icon: 'img/twemoji/2198.svg',
+          onclick: function(d){
+            alert(d+'');
+          }
+        },{
+          label:'拖动'
+        },{
+          label:'菜单'
+        }
+      ]
+    }
 });
 ```
 
 ## What's coming?
 
-* Toolbar.
-* More than one relationship between two nodes.
-* Markers.
-* Performance optimization.
-* Testing.
+No Plan 
 
 ## Copyright and license
 

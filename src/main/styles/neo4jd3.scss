@@ -78,6 +78,22 @@ body {
         stroke: #6ac6ff;
         stroke-width: 8px;
     }
+    
+    .menu-item{
+      display: none;
+      -ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=30)';
+      filter: alpha(opacity=30);
+      opacity: .3;
+    }
+    /* .menu-item:hover{
+      -ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=80)';
+      filter: alpha(opacity=80);
+      opacity: .8;
+    } */
+    
+    .menu-item-v{
+      display: inherit;
+    }
 
     .text {
         &.icon {

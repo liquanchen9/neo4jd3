@@ -22,9 +22,27 @@ function Neo4jD3(_selector, _options) {
             nodeOutlineFillColor: undefined,
             nodeRadius: 25,
             relationshipColor: '#a5abb6',
+            /*menuOptions: {
+               items:[
+                 {
+                   label:'test label1',
+                   icon: 'img/twemoji/2198.svg',
+                   onclick: function(d){
+                     alert(d+'');
+                   }
+                 },{
+                   label:'test',
+                   height: '-2px',
+                   width:'2px'
+                 },{},{},{}
+               ],
+               radius: 1.8,
+               strokeColor: 'white',
+               strokeWidth: 2
+            }*/
             zoomFit: false
         },
-        VERSION = '0.0.1';
+        VERSION = '0.0.8';//更新下组件版本号
 
     function appendGraph(container) {
         svg = container.append('svg')
@@ -145,14 +163,15 @@ function Neo4jD3(_selector, _options) {
                    })
                    .on('click', function(d) {
                        d.fx = d.fy = null;
-
+                       if(options.menuOptions){
+                          showMenu(this,d);
+                       }
                        if (typeof options.onNodeClick === 'function') {
                            options.onNodeClick(d);
                        }
                    })
                    .on('dblclick', function(d) {
                        stickNode(d);
-
                        if (typeof options.onNodeDoubleClick === 'function') {
                            options.onNodeDoubleClick(d);
                        }
@@ -180,22 +199,122 @@ function Neo4jD3(_selector, _options) {
                            .on('drag', dragged)
                            .on('end', dragEnded));
     }
-
+    
+    function showMenu(node,data){
+       console.log(svgNodes.selectAll('.menu-item-v'));
+       svgNodes.selectAll('.menu-item-v').attr('class','menu-item');
+       d3.select(node).selectAll('.menu-item').attr('class',function(){
+         var classes = 'menu-item';
+         if (options.menuOptions) {
+             classes += ' menu-item-v';
+         }
+         return classes;
+       });
+    }
+    
     function appendNodeToGraph() {
         var n = appendNode();
-
-        appendRingToNode(n);
+        if (options.menuOptions) {
+            appendMenuToNode(n);
+        }else{
+            appendRingToNode(n);
+        }
         appendOutlineToNode(n);
 
         if (options.icons) {
             appendTextToNode(n);
         }
-
+        
+       
+        
         if (options.images) {
             appendImageToNode(n);
         }
 
         return n;
+    }
+    
+    /* ==== 计算Xy坐标 ==== */
+    /**
+    * @param  {[type]} r      [半径]
+    * @param  {[type]} angel  [角度]
+    * @param  {[type]} origin [原点坐标]
+    * @return {[Array]} 坐标
+    */
+    function evaluateXY(r, angel, origin) {
+    	return [
+    		origin[0] + Math.sin(angel) * r,
+    		origin[0] - Math.cos(angel) * r,
+    		];
+    }
+    
+    
+    function appendMenuToNode(node) {
+        var r = options.nodeRadius,
+        origin = [0,0],
+        sAngel = 0, // 起始点角度
+        eAngel = 0; // 结束点角度
+        var menuOptions = options.menuOptions,
+        R = options.nodeRadius * menuOptions.radius;
+        for (var i = 0; i < menuOptions.items.length; i++) {
+           var item = menuOptions.items[i];
+           var largeArcFlag = eAngel - sAngel > Math.PI ? "1" : "0";
+           var itemData = Object.assign({}, item);//copy一遍，不直接修改原数据
+           eAngel = sAngel + (1 / menuOptions.items.length) * 2 * Math.PI; //计算结束弧度
+           itemData.arclineStarts = [
+               evaluateXY(r, sAngel, origin), //计算P0坐标
+               evaluateXY(R, sAngel, origin), //计算P1坐标 
+               evaluateXY(R, eAngel, origin), //计算P2坐标 
+               evaluateXY(r, eAngel, origin)  //计算P3坐标
+               ];
+           itemData.LargeArcFlag = (eAngel - sAngel) > Math.PI ? '1' : '0';//大于Math.PI需要画大弧，否则画小弧         
+           var p = itemData.arclineStarts;
+           var d = 'M '+p[0][0]+' '+p[0][1]+' L '+p[1][0]+' '+p[1][1]+' A '+R+' '+R+' 0 '+itemData.LargeArcFlag+' 1 '+p[2][0]+' '+p[2][1]+' L '+p[3][0]+' '+p[3][1]+'z';
+           node.append('path').attr('class', 'menu-item').attr('d',d)
+                       .style('fill', function(d) {
+                           return item.fillColor ? item.fillColor : '#6ac6ff';
+                       })
+                       .style('stroke', menuOptions.strokeColor)
+                       .style('stroke-width', menuOptions.strokeWidth);
+           if(item.icon){
+              node.append('image').attr('class', 'menu-item')
+              .attr('href',item.icon)
+              .attr('width',item.width || '10px')
+              .attr('height',item.height || '10px')
+              .attr('transform',function(){
+                  var rotate = 360/menuOptions.items.length;
+                  rotate = rotate*i + rotate/2;
+                  return 'rotate('+rotate+')';
+              })
+              .attr('x',-(parseInt(item.width || '10px')/2))
+              .attr('y',-(options.nodeRadius * ((menuOptions.radius - 1)/2+1) + parseInt(item.height || '10px')/2));
+           }else if(item.label){
+              node.append('text').attr('class', 'menu-item')
+              .attr('transform',function(){
+                  var rotate = 360/menuOptions.items.length;
+                  rotate = rotate*i + rotate/2;
+                  return 'rotate('+rotate+')';
+              })
+              .attr('fill', item.fontColor || '#000')
+              .attr('font-size', item.fontSize || '8px')
+              .attr('pointer-events', 'none')
+              .attr('text-anchor', 'middle')
+              .attr('x',-(parseInt(item.width || '2px')/2))
+              .attr('y',-(options.nodeRadius * ((menuOptions.radius - 1)/2+1) + parseInt(item.height || '-6px')/2))
+              .html(item.label);
+           }
+           var itemOnclickElement = node.append('path').attr('class', 'menu-item').attr('d',d)
+                       .style('fill', 'white')
+                       .style('stroke', menuOptions.strokeColor)
+                       .style('stroke-width', menuOptions.strokeWidth)
+                       .style('opacity', '.01')
+                       .style('filter', 'alpha(opacity=1)')
+                       .style('-ms-filter', 'progid:DXImageTransform.Microsoft.Alpha(Opacity=1)');
+           if( typeof item.onclick === 'function' ){
+              itemOnclickElement.on('click',item.onclick);
+           }
+           sAngel = eAngel;//将下一项数据的起始弧度设置为当前项的结束弧度
+        }
     }
 
     function appendOutlineToNode(node) {
@@ -475,6 +594,14 @@ function Neo4jD3(_selector, _options) {
 
         if (!options.minCollision) {
             options.minCollision = options.nodeRadius * 2;
+        }
+        
+        if(options.menuOptions){
+          merge(options.menuOptions, {
+               radius: 1.8,
+               strokeColor: 'white',
+               strokeWidth: 2
+            });
         }
 
         initImageMap();
