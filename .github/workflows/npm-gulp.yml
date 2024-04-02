@@ -27,6 +27,7 @@ jobs:
         
     - name: Commit changes
       run: |
+        echo "npm-shrinkwrap.json" >> .gitignore 
         git add .
         git config --global user.email "liquanchen9@sina.com"
         git config --global user.name "liquanchen9"
