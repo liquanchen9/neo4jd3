@@ -6,7 +6,7 @@ var autoprefixer = require('gulp-autoprefixer'),
     cssnano = require('gulp-cssnano'),
     gulp = require('gulp'),
     rename = require('gulp-rename'),
-    sass = require('gulp-ruby-sass');
+    sass = require('gulp-sass');
 
 gulp.task('styles', ['styles:build'], function() {
     return gulp.src([
