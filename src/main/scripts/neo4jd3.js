@@ -201,7 +201,7 @@ function Neo4jD3(_selector, _options) {
     }
     
     function showMenu(node,data){
-       console.log(svgNodes.selectAll('.menu-item-v'));
+       //console.log(svgNodes.selectAll('.menu-item-v'));
        svgNodes.selectAll('.menu-item-v').attr('class','menu-item');
        d3.select(node).selectAll('.menu-item').attr('class',function(){
          var classes = 'menu-item';
@@ -665,7 +665,7 @@ function Neo4jD3(_selector, _options) {
                            .force('collide', d3.forceCollide().radius(function(d) {
                                return options.minCollision;
                            }).iterations(2))
-                           .force('charge', d3.forceManyBody())
+                           .force('charge', d3.forceManyBody().strength(-500))
                            .force('link', d3.forceLink().id(function(d) {
                                return d.id;
                            }))
